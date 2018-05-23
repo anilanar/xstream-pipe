@@ -13,6 +13,12 @@ __  _____| |_ _ __ ___  __ _ _ __ ___ ______ _ __  _ _ __   ___
 
 Exports core xstream operators as pipeable operators.
 
+## Installation
+
+```bash
+npm install xstream-pipe
+```
+
 ## Example
 
 ```js
