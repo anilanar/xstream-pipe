@@ -10,7 +10,9 @@
         "build": "tsc",
         "lint": "tslint -c tslint.json src/*.ts",
         "prepublish": "npm run build",
-        "version": "npm run lint && npm run changelog && git add -A"
+        "preversion": "npm run changelog && npm run lint",
+        "version": "npm run changelog && git add -A",
+        "postversion": "git push origin master && git push origin --tags && npm publish"
     },
     "repository": "https://github.com/anilanar/xstream-pipe",
     "bugs": {
@@ -20,7 +22,7 @@
     "author": "Anil Anar",
     "license": "MIT",
     "dependencies": {
-        "xstream": "^0.0.0"
+        "xstream": "^11.0.0"
     },
     "devDependencies": {
         "commitizen": "^2.9.6",
