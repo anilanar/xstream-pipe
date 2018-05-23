@@ -23,7 +23,7 @@ export interface OperatorFunction<T, R> extends UnaryFunction<Stream<T>, Stream<
  * @return {OperatorFunction}
  */
 export function map<T, U>(project: (value: T) => U): OperatorFunction<T, U> {
-    return stream => stream.map(project);
+    return function(stream) { return stream.map(project); };
 }
 
 /**
@@ -43,7 +43,7 @@ export function map<T, U>(project: (value: T) => U): OperatorFunction<T, U> {
  * @return {OperatorFunction}
  */
 export function mapTo<T, R>(projectedValue: R): OperatorFunction<T, R> {
-    return stream => stream.mapTo(projectedValue);
+    return function(stream) { return stream.mapTo(projectedValue); };
 }
 
 /**
@@ -67,7 +67,7 @@ export function mapTo<T, R>(projectedValue: R): OperatorFunction<T, R> {
  * @return {OperatorFunction}
  */
 export function filter<T, S extends T>(passes: (t: T) => t is S): OperatorFunction<T, S> {
-    return stream => stream.filter(passes);
+    return function(stream) { return stream.filter(passes); };
 }
 /**
  * Lets the first `amount` many events from the input stream pass to the
@@ -86,7 +86,7 @@ export function filter<T, S extends T>(passes: (t: T) => t is S): OperatorFuncti
  * @return {OperatorFunction}
  */
 export function take<T>(amount: number): OperatorFunction<T, T> {
-    return stream => stream.take(amount);
+    return function(stream) { return stream.take(amount); };
 }
 /**
  * Ignores the first `amount` many events from the input stream, and then
@@ -106,7 +106,7 @@ export function take<T>(amount: number): OperatorFunction<T, T> {
  * @return {OperatorFunction}
  */
 export function drop<T>(amount: number): OperatorFunction<T, T> {
-    return stream => stream.drop(amount);
+    return function(stream) { return stream.drop(amount); };
 }
 
 /**
@@ -124,7 +124,7 @@ export function drop<T>(amount: number): OperatorFunction<T, T> {
  * @return {OperatorFunction}
  */
 export function last<T>(): OperatorFunction<T, T> {
-    return stream => stream.last();
+    return function(stream) { return stream.last(); };
 }
 /**
  * Prepends the given `initial` value to the sequence of events emitted by the
@@ -143,7 +143,7 @@ export function last<T>(): OperatorFunction<T, T> {
  * @return {OperatorFunction}
  */
 export function startWith<T>(initial: T): UnaryFunction<Stream<T>, MemoryStream<T>> {
-    return stream => stream.startWith(initial);
+    return function(stream) { return stream.startWith(initial); };
 }
 
 /**
@@ -166,7 +166,7 @@ export function startWith<T>(initial: T): UnaryFunction<Stream<T>, MemoryStream<
  * @return {OperatorFunction}
  */
 export function endWhen<T>(other: Stream<any>): OperatorFunction<T, T> {
-    return stream => stream.endWhen(other);
+    return function(stream) { return stream.endWhen(other); };
 }
 
 /**
@@ -199,7 +199,7 @@ export function endWhen<T>(other: Stream<any>): OperatorFunction<T, T> {
  * @return {OperatorFunction}
  */
 export function fold<T, R>(accumulate: (acc: R, t: T) => R, seed: R): UnaryFunction<Stream<T>, MemoryStream<R>> {
-    return stream => stream.fold(accumulate, seed);
+    return function(stream) { return stream.fold(accumulate, seed); };
 }
 
 /**
@@ -226,7 +226,7 @@ export function fold<T, R>(accumulate: (acc: R, t: T) => R, seed: R): UnaryFunct
  * @return {OperatorFunction}
  */
 export function replaceError<T>(replace: (err: any) => Stream<T>): OperatorFunction<T, T> {
-    return stream => stream.replaceError(replace);
+    return function(stream) { return stream.replaceError(replace); };
 }
 
 /**
@@ -255,7 +255,7 @@ export function replaceError<T>(replace: (err: any) => Stream<T>): OperatorFunct
  * @return {OperatorFunction}
  */
 export function flatten<T>(): OperatorFunction<Stream<T>, T> {
-    return stream => stream.flatten();
+    return function(stream) { return stream.flatten(); };
 }
 
 /**
@@ -266,7 +266,7 @@ export function flatten<T>(): OperatorFunction<Stream<T>, T> {
  * @return {OperatorFunction}
  */
 export function remember<T>(): UnaryFunction<Stream<T>, MemoryStream<T>> {
-    return stream => stream.remember();
+    return function(stream) { return stream.remember(); };
 }
 
 /**
@@ -296,5 +296,39 @@ export function remember<T>(): UnaryFunction<Stream<T>, MemoryStream<T>> {
  * @return {OperatorFunction}
  */
 export function debug<T>(labelOrSpy: string): OperatorFunction<T, T> {
-    return stream => stream.debug(labelOrSpy);
+    return function(stream) { return stream.debug(labelOrSpy); };
+}
+
+/**
+ * Creates an operator that is composed of all given operators.
+ *
+ * *pipe* is a handy way of creating operators in a chained-style.
+ * Instead of writing `stream$.filter(foo).map(bar)` you can write:
+ * `stream$.compose(pipe(filter(foo), map(bar))` or
+ * `pipe(filter(foo), map(bar))(stream$)`.
+ *
+ * @param {Array<OperatorFunction>} operators Functions that takes a stream as input and
+ * returns a stream as well.
+ * @return {OperatorFunction}
+ */
+/* tslint:disable:max-line-length */
+export function pipe<T>(): UnaryFunction<T, T>;
+export function pipe<T, A>(op1: UnaryFunction<T, A>): UnaryFunction<T, A>;
+export function pipe<T, A, B>(op1: UnaryFunction<T, A>, op2: UnaryFunction<A, B>): UnaryFunction<T, B>;
+export function pipe<T, A, B, C>(op1: UnaryFunction<T, A>, op2: UnaryFunction<A, B>, op3: UnaryFunction<B, C>): UnaryFunction<T, C>;
+export function pipe<T, A, B, C, D>(op1: UnaryFunction<T, A>, op2: UnaryFunction<A, B>, op3: UnaryFunction<B, C>, op4: UnaryFunction<C, D>): UnaryFunction<T, D>;
+export function pipe<T, A, B, C, D, E>(op1: UnaryFunction<T, A>, op2: UnaryFunction<A, B>, op3: UnaryFunction<B, C>, op4: UnaryFunction<C, D>, op5: UnaryFunction<D, E>): UnaryFunction<T, E>;
+export function pipe<T, A, B, C, D, E, F>(op1: UnaryFunction<T, A>, op2: UnaryFunction<A, B>, op3: UnaryFunction<B, C>, op4: UnaryFunction<C, D>, op5: UnaryFunction<D, E>, op6: UnaryFunction<E, F>): UnaryFunction<T, F>;
+export function pipe<T, A, B, C, D, E, F, G>(op1: UnaryFunction<T, A>, op2: UnaryFunction<A, B>, op3: UnaryFunction<B, C>, op4: UnaryFunction<C, D>, op5: UnaryFunction<D, E>, op6: UnaryFunction<E, F>, op7: UnaryFunction<F, G>): UnaryFunction<T, G>;
+export function pipe<T, A, B, C, D, E, F, G, H>(op1: UnaryFunction<T, A>, op2: UnaryFunction<A, B>, op3: UnaryFunction<B, C>, op4: UnaryFunction<C, D>, op5: UnaryFunction<D, E>, op6: UnaryFunction<E, F>, op7: UnaryFunction<F, G>, op8: UnaryFunction<G, H>): UnaryFunction<T, H>;
+export function pipe<T, A, B, C, D, E, F, G, H, I>(op1: UnaryFunction<T, A>, op2: UnaryFunction<A, B>, op3: UnaryFunction<B, C>, op4: UnaryFunction<C, D>, op5: UnaryFunction<D, E>, op6: UnaryFunction<E, F>, op7: UnaryFunction<F, G>, op8: UnaryFunction<G, H>, op9: UnaryFunction<H, I>): UnaryFunction<T, I>;
+/* tslint:enable:max-line-length */
+
+export function pipe<T, R>(...operators: any[]): UnaryFunction<T, R> {
+    if (operators.length === 1) {
+        return operators[0];
+    }
+    return function(input: T): R {
+        return operators.reduce(function(prev: any, fn) { return fn(prev); }, input);
+    };
 }
