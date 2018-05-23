@@ -17,11 +17,13 @@ Exports core xstream operators as pipeable operators.
 
 ```js
 import xs from 'xstream'
-import { pipe, filter, map, endWhen, take } from 'xstream-pipe';
+import delay from 'xstream/extra/delay'
+import { pipe, filter, map, endWhen, take } from 'xstream-pipe'
 
 const operator = pipe(
   filter(i => i % 2 === 0),
   map(i => i * i),
+  delay(60),
   endWhen(xs.periodic(5000).compose(take(1))),
 )
 
